@@ -122,6 +122,8 @@ public:
     {
         if (cfg->key_pattern[index] == 'R') {
             return OBJECT_GENERATOR_KEY_RANDOM;
+        } else if (cfg->key_pattern[index] == 'Z') {
+            return OBJECT_GENERATOR_KEY_ZIPFIAN;
         } else if (cfg->key_pattern[index] == 'G') {
             return OBJECT_GENERATOR_KEY_GAUSSIAN;
         } else {
@@ -135,6 +137,8 @@ public:
     inline int get_arbitrary_obj_iter_type(const arbitrary_command* cmd, unsigned int index) {
         if (cmd->key_pattern == 'R') {
             return OBJECT_GENERATOR_KEY_RANDOM;
+        } else if (cmd->key_pattern == 'Z') {
+            return OBJECT_GENERATOR_KEY_ZIPFIAN;
         } else if (cmd->key_pattern == 'G') {
             return OBJECT_GENERATOR_KEY_GAUSSIAN;
         } else {

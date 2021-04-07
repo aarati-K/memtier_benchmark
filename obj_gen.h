@@ -70,11 +70,13 @@ public:
     unsigned int get_expiry(void);
 };
 
+/* It seems like set and get requests have different key iterators */
 #define OBJECT_GENERATOR_KEY_ITERATORS  2 /* number of iterators */
 #define OBJECT_GENERATOR_KEY_SET_ITER   1
 #define OBJECT_GENERATOR_KEY_GET_ITER   0
 #define OBJECT_GENERATOR_KEY_RANDOM    -1
-#define OBJECT_GENERATOR_KEY_GAUSSIAN  -2
+#define OBJECT_GENERATOR_KEY_ZIPFIAN   -2
+#define OBJECT_GENERATOR_KEY_GAUSSIAN  -3
 
 class object_generator {
 public:

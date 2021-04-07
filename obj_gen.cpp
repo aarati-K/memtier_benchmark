@@ -368,6 +368,9 @@ unsigned long long object_generator::get_key_index(int iter)
     unsigned long long k;
     if (iter==OBJECT_GENERATOR_KEY_RANDOM) {
         k = random_range(m_key_min, m_key_max);
+    } else if (iter==OBJECT_GENERATOR_KEY_ZIPFIAN) {
+        // for now
+        k = normal_distribution(m_key_min, m_key_max, m_key_stddev, m_key_median);
     } else if(iter==OBJECT_GENERATOR_KEY_GAUSSIAN) {
         k = normal_distribution(m_key_min, m_key_max, m_key_stddev, m_key_median);
     } else {
