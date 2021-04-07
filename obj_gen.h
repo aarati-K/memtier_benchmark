@@ -78,6 +78,10 @@ public:
 #define OBJECT_GENERATOR_KEY_ZIPFIAN   -2
 #define OBJECT_GENERATOR_KEY_GAUSSIAN  -3
 
+// HACK: Zipfian distribution parameters
+#define ZIPF_FACTOR 1.0
+#define ZIPF_ORDER 1 // -1 for highest to lowest
+
 class object_generator {
 public:
     enum data_size_type { data_size_unknown, data_size_fixed, data_size_range, data_size_weighted };
@@ -111,9 +115,14 @@ protected:
     gaussian_noise m_random;
     unsigned int m_value_buffer_size;
     unsigned int m_value_buffer_mutation_pos;
+    double *m_prob_array;
+
+    void init_prob_array(void);
+    void init_prob_array(const double* copy_from);
 
     void alloc_value_buffer(void);
     void alloc_value_buffer(const char* copy_from);
+
     void random_init(void);
 public:
     object_generator(size_t n_key_iterators = OBJECT_GENERATOR_KEY_ITERATORS);
@@ -123,6 +132,7 @@ public:
 
     unsigned long long random_range(unsigned long long r_min, unsigned long long r_max);
     unsigned long long normal_distribution(unsigned long long r_min, unsigned long long r_max, double r_stddev, double r_median);
+    unsigned long long zipfian_distribution(unsigned long long r_min, unsigned long long r_max);
 
     void set_random_data(bool random_data);
     void set_data_size_fixed(unsigned int size);

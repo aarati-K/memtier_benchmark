@@ -158,6 +158,8 @@ object_generator::object_generator(size_t n_key_iterators/*= OBJECT_GENERATOR_KE
     m_next_key.resize(n_key_iterators, 0);
 
     m_data_size.size_list = NULL;
+
+    init_prob_array();
 }
 
 object_generator::object_generator(const object_generator& copy) :
@@ -182,6 +184,8 @@ object_generator::object_generator(const object_generator& copy) :
         m_data_size.size_list = new config_weight_list(*m_data_size.size_list);
     }
     alloc_value_buffer(copy.m_value_buffer);
+
+    init_prob_array(copy.m_prob_array);
 
     m_next_key.resize(copy.m_next_key.size(), 0);
 }
@@ -208,6 +212,32 @@ object_generator* object_generator::clone(void)
 void object_generator::set_random_seed(int seed)
 {
     m_random.set_seed(seed);
+}
+
+void object_generator::init_prob_array(void)
+{
+    unsigned long long n = m_key_max - m_key_min + 1;
+    unsigned long long i;
+    double alpha = ZIPF_FACTOR;
+    double prob = 0;
+
+    m_prob_array = (double*)malloc(sizeof(double)*(n+1));
+    m_prob_array[0] = 0;
+    for (i=1; i<=n; i++) {
+        prob += 1/pow(double(i+1), alpha);
+        m_prob_array[i] = prob;
+    }
+
+    // normalize, probabilities sum to 1
+    for (i=0; i<=n; i++) {
+        m_prob_array[i] = m_prob_array[i]/prob;
+    }
+}
+
+void object_generator::init_prob_array(const double *copy_from) {
+    unsigned long long n = m_key_max - m_key_min + 1;
+    m_prob_array = (double*)malloc(sizeof(double)*(n+1));
+    memcpy(m_prob_array, copy_from, sizeof(double)*(n+1));
 }
 
 void object_generator::alloc_value_buffer(void)
@@ -361,6 +391,32 @@ unsigned long long object_generator::normal_distribution(unsigned long long r_mi
     return m_random.gaussian_distribution_range(r_stddev, r_median, r_min, r_max);
 }
 
+unsigned long long object_generator::zipfian_distribution(unsigned long long r_min, unsigned long long r_max) {
+    unsigned long long low = 0, high = r_max - r_min + 1, mid;
+    double r = m_random.get_random() / double(m_random.get_random_max());
+
+    do {
+        mid = (low+high)/2;
+        if (m_prob_array[mid] >= r && m_prob_array[mid-1] < r) {
+            break;
+        } else if (m_prob_array[mid] >= r) {
+            high = mid - 1;
+        } else {
+            // m_prob_array[mid] < r
+            low = mid + 1;
+        }
+    } while (low < high);
+    if (mid == 0) {
+        // This should not happen
+        mid = 1;
+    }
+    if (ZIPF_ORDER < 0) {
+        // Reverse order of popularity
+        return r_max - mid + 1;
+    }
+    return r_min + mid - 1;
+}
+
 unsigned long long object_generator::get_key_index(int iter)
 {
     assert(iter < static_cast<int>(m_next_key.size()) && iter >= OBJECT_GENERATOR_KEY_GAUSSIAN);
@@ -369,8 +425,7 @@ unsigned long long object_generator::get_key_index(int iter)
     if (iter==OBJECT_GENERATOR_KEY_RANDOM) {
         k = random_range(m_key_min, m_key_max);
     } else if (iter==OBJECT_GENERATOR_KEY_ZIPFIAN) {
-        // for now
-        k = normal_distribution(m_key_min, m_key_max, m_key_stddev, m_key_median);
+        k = zipfian_distribution(m_key_min, m_key_max);
     } else if(iter==OBJECT_GENERATOR_KEY_GAUSSIAN) {
         k = normal_distribution(m_key_min, m_key_max, m_key_stddev, m_key_median);
     } else {
