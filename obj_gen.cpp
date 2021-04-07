@@ -158,8 +158,6 @@ object_generator::object_generator(size_t n_key_iterators/*= OBJECT_GENERATOR_KE
     m_next_key.resize(n_key_iterators, 0);
 
     m_data_size.size_list = NULL;
-
-    init_prob_array();
 }
 
 object_generator::object_generator(const object_generator& copy) :
@@ -370,6 +368,7 @@ void object_generator::set_key_range(unsigned long long key_min, unsigned long l
 {
     m_key_min = key_min;
     m_key_max = key_max;
+    init_prob_array();
 }
 
 void object_generator::set_key_distribution(double key_stddev, double key_median)
