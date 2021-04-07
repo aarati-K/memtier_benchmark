@@ -696,13 +696,15 @@ static int config_parse_args(int argc, char *argv[], struct benchmark_config *cf
                     if (strlen(cfg->key_pattern) != 3 || cfg->key_pattern[key_pattern_delimiter] != ':' ||
                         (cfg->key_pattern[key_pattern_set] != 'R' &&
                          cfg->key_pattern[key_pattern_set] != 'S' &&
+                         cfg->key_pattern[key_pattern_set] != 'Z' &&
                          cfg->key_pattern[key_pattern_set] != 'G' &&
                          cfg->key_pattern[key_pattern_set] != 'P') ||
                         (cfg->key_pattern[key_pattern_get] != 'R' &&
                          cfg->key_pattern[key_pattern_get] != 'S' &&
+                         cfg->key_pattern[key_pattern_get] != 'Z' &&
                          cfg->key_pattern[key_pattern_get] != 'G' &&
                          cfg->key_pattern[key_pattern_get] != 'P')) {
-                        fprintf(stderr, "error: key-pattern must be in the format of [S/R/G/P]:[S/R/G/P].\n");
+                        fprintf(stderr, "error: key-pattern must be in the format of [S/R/Z/G/P]:[S/R/Z/G/P].\n");
                         return -1;
                     }
 
@@ -938,6 +940,7 @@ void usage() {
             "      --key-maximum=NUMBER       Key ID maximum value (default: 10000000)\n"
             "      --key-pattern=PATTERN      Set:Get pattern (default: R:R)\n"
             "                                 G for Gaussian distribution.\n"
+            "                                 Z for Zipfian distribution.\n"
             "                                 R for uniform Random.\n"
             "                                 S for Sequential.\n"
             "                                 P for Parallel (Sequential were each client has a subset of the key-range).\n"
