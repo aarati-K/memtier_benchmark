@@ -232,10 +232,8 @@ void object_generator::init_prob_array(void)
     }
 }
 
-void object_generator::init_prob_array(const double *copy_from) {
-    unsigned long long n = m_key_max - m_key_min + 1;
-    m_prob_array = (double*)malloc(sizeof(double)*(n+1));
-    memcpy(m_prob_array, copy_from, sizeof(double)*(n+1));
+void object_generator::init_prob_array(double *copy_from) {
+    m_prob_array = copy_from;
 }
 
 void object_generator::alloc_value_buffer(void)

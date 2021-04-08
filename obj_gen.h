@@ -118,7 +118,7 @@ protected:
     double *m_prob_array;
 
     void init_prob_array(void);
-    void init_prob_array(const double* copy_from);
+    void init_prob_array(double* copy_from);
 
     void alloc_value_buffer(void);
     void alloc_value_buffer(const char* copy_from);
