@@ -229,6 +229,7 @@ void object_generator::init_prob_array(void)
     // normalize, probabilities sum to 1
     for (i=0; i<=n; i++) {
         m_prob_array[i] = m_prob_array[i]/prob;
+        m_prob_array[i] = m_prob_array[i]*20*n;
     }
 }
 
@@ -390,28 +391,22 @@ unsigned long long object_generator::normal_distribution(unsigned long long r_mi
 
 unsigned long long object_generator::zipfian_distribution(unsigned long long r_min, unsigned long long r_max) {
     unsigned long long low = 0, high = r_max - r_min + 1, mid;
-    double r = m_random.get_random() / double(m_random.get_random_max());
+    unsigned long long n = r_max - r_min + 1;
+    double r = double(random() % (20*n));
 
     do {
-        mid = (low+high)/2;
-        if (m_prob_array[mid] >= r && m_prob_array[mid-1] < r) {
-            break;
-        } else if (m_prob_array[mid] >= r) {
-            high = mid - 1;
-        } else {
-            // m_prob_array[mid] < r
-            low = mid + 1;
+        mid = (low + high)/2;
+        if (m_prob_array[mid] > r) {
+            high = mid;
+        } else if (m_prob_array[mid] <= r) {
+            low = mid;
         }
-    } while (low < high);
-    if (mid == 0) {
-        // This should not happen
-        mid = 1;
-    }
+    } while ((high - low) > 1);
     if (ZIPF_ORDER < 0) {
         // Reverse order of popularity
-        return r_max - mid + 1;
+        return r_max - mid;
     }
-    return r_min + mid - 1;
+    return r_min + mid;
 }
 
 unsigned long long object_generator::get_key_index(int iter)
